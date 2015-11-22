@@ -39,7 +39,7 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="VkNet">
-      <HintPath>..\..\..\Github\vk\Debug\VkNet.dll</HintPath>
+      <HintPath>..\vk\Debug\VkNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
