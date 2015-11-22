@@ -17,7 +17,8 @@
     {
         private VkApi _account;
 
-        private GetLongPollHistoryParams reqParams;
+        private ulong? Ts { get; set; }
+        private ulong? Pts { get; set; }
 
         public bool Active { get; private set; }
 
@@ -34,15 +35,14 @@
         public LongPoolWatcher(VkApi api)
         {
             _account = api;
-            reqParams = new GetLongPollHistoryParams();
         }
 
         private LongPollServerResponse GetLongPoolServer(ulong? lastPts = null)
         {
             var response = _account.Messages.GetLongPollServer(false, lastPts == null);
 
-            reqParams.Ts = response.Ts;
-            reqParams.Pts = lastPts == null ? response.Pts : lastPts;
+            Ts = response.Ts;
+            Pts = Pts == null ? response.Pts : lastPts;
 
             return response;
         }
@@ -53,6 +53,12 @@
 
         private LongPollHistoryResponse GetLongPoolHistory()
         {
+            if (!Ts.HasValue)
+                GetLongPoolServer(null);
+            GetLongPollHistoryParams rp = new GetLongPollHistoryParams();
+            rp.Ts = Ts.Value;
+            rp.Pts = Pts;
+
             int c = 0;
             LongPollHistoryResponse history = null;
             string errorLog = "";
@@ -62,7 +68,7 @@
                 c++;
                 try
                 {
-                    history = _account.Messages.GetLongPollHistory(reqParams);
+                    history = _account.Messages.GetLongPollHistory(rp);
                 }
                 catch (TooManyRequestsException)
                 {
@@ -75,7 +81,7 @@
             }
 
             if (history != null)
-                reqParams.Pts = history.NewPts;
+                Pts = history.NewPts;
             else
                 throw new NotImplementedException(errorLog);
 
@@ -86,16 +92,19 @@
             return Task.Run(() => { return GetLongPoolHistory(); });
         }
 
-        public Task<List<Message>> LoadDialogsAsync(int offset, int count = 20)
+        public Task<List<Message>> LoadDialogsAsync(uint offset, uint count = 20)
         {
             if (_account == null || string.IsNullOrEmpty(_account.AccessToken))
                 throw new NotImplementedException("Не авторизован в API ВК");
 
             return Task.Run(() =>
             {
-                int total;
-                var dialogs = _account.Messages.GetDialogs(out total, out total, count, offset);
-                return dialogs.ToList();
+                DialogsGetParams p = new DialogsGetParams();
+                p.Count = count;
+                p.Offset = (int)offset;
+
+                DialogsGetObject d = _account.Messages.GetDialogs(p);
+                return d.Dialogs.ToList();
             });
         }
 
