@@ -25,7 +25,7 @@ namespace VkNetExtend
         public VKController(VkApi api, int applicationId)
         {
             _api = api;
-
+            WallWatchers = new Hashtable();
         }
 
         public void StartMessagesUpdateWatch(ulong? LastTs = null, ulong? LastPts = null)

@@ -10,6 +10,7 @@
     using VkNet;
     using VkNet.Model;
     using VkNet.Model.RequestParams.Wall;
+    using VkNet.Model.RequestParams.Messages;
     using VkNet.Enums.Filters;
 
     public static class APIController
@@ -88,18 +89,21 @@
             return Task.Run(() => { return GetGroups(api, gids, fields); });
         }
 
-        public static List<Message> LoadDialogs(VkApi api, uint offset = 0, uint count = 20)
+        public static List<Message> LoadDialogs(VkApi api, int offset = 0, uint count = 20)
         {
             _checkLocker(api);
-            ReadOnlyCollection<Message> res = null;
-            int total;
+            MessagesGetObject res = null;
+            DialogsGetParams dp = new DialogsGetParams();
+            dp.Count = count;
+            dp.Offset = offset;
+
             lock (_lockers[api.AccessToken])
             {
-                res = api.Messages.GetDialogs(out total, out total, (int)count, (int)offset);
+                res = api.Messages.GetDialogs(dp);
             }
-            return res.ToList();
+            return res.Messages.ToList();
         }
-        public static Task<List<Message>> LoadDialogsAsync(VkApi api, uint offset = 0, uint count = 20)
+        public static Task<List<Message>> LoadDialogsAsync(VkApi api, int offset = 0, uint count = 20)
         {
             return Task.Run(() => { return LoadDialogs(api, offset, count); });
         }

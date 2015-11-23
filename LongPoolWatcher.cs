@@ -103,8 +103,8 @@
                 p.Count = count;
                 p.Offset = (int)offset;
 
-                DialogsGetObject d = _account.Messages.GetDialogs(p);
-                return d.Dialogs.ToList();
+                MessagesGetObject d = _account.Messages.GetDialogs(p);
+                return d.Messages.ToList();
             });
         }
 
