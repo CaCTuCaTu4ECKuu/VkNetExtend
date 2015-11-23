@@ -30,7 +30,7 @@
         private byte _currentSleepSteps = 1;
         #endregion
 
-        public static event MessagesRecievedDelegate onNewMessages;
+        public event MessagesRecievedDelegate NewMessages;
 
         public LongPoolWatcher(VkApi api)
         {
@@ -114,8 +114,8 @@
             if (history.Messages.Count > 0)
             {
                 _currentSleepSteps = 1;
-                if (onNewMessages != null)
-                    onNewMessages(history.Messages, _account.UserId.Value);
+                if (NewMessages != null)
+                    NewMessages(history.Messages, _account.UserId.Value);
             }
             else if (_currentSleepSteps < MaxSleepSteps)
                 _currentSleepSteps++;

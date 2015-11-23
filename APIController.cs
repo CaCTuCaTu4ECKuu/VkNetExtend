@@ -117,13 +117,13 @@
             return g.FixedPostId.HasValue ? g.FixedPostId.Value : -1;
         }
 
-        public static WallGetObject GetWallPosts(VkApi api, long gid, uint offset, uint count = 20)
+        public static WallGetObject GetWallPosts(VkApi api, long ownerId, uint offset, uint count = 20)
         {
             _checkLocker(api);
             WallGetObject res = null;
 
             WallGetParams p = new WallGetParams();
-            p.OwnerId = -gid;
+            p.OwnerId = ownerId;
             p.Count = count;
             p.Offset = offset;
 
@@ -132,11 +132,11 @@
             return res;
 
         }
-        public static Task<WallGetObject> GetWallPostsAsync(VkApi api, long gid, uint offset, uint count = 20)
+        public static Task<WallGetObject> GetWallPostsAsync(VkApi api, long ownerId, uint offset, uint count = 20)
         {
             return Task.Run(() =>
             {
-                return GetWallPosts(api, gid, count, offset);
+                return GetWallPosts(api, ownerId, count, offset);
             });
         }
 

@@ -12,20 +12,20 @@ namespace VkNetExtend
     using VkNet.Model;
     using VkNet.Exception;
 
-    public delegate void PostsListDelegate(long gid, IEnumerable<Post> posts);
-    public delegate void FixedPostChangedDelegate(long gid, long pid);
+    public delegate void PostsListDelegate(long ownerId, IEnumerable<Post> posts);
+    public delegate void FixedPostChangedDelegate(long ownerId, long pid);
 
     public class WallWatcher
     {
         private VkApi API { get; set; }
 
-        public long GroupId { get; private set; }
+        public long OwnerId { get; private set; }
         public bool Active { get; private set; }
         public long LastPostId { get; private set; }
         public long FixedPostId { get; private set; }
 
         /// <summary>
-        /// Вызывает событие <see cref="onNewPosts"/> как только получает массив постов, а не когда загрузит запрашиваемые записи
+        /// Вызывает событие <see cref="NewPosts"/> как только получает массив постов, а не когда загрузит запрашиваемые записи
         /// </summary>
         public bool? InformImmediately { get; private set; }
 
@@ -40,22 +40,22 @@ namespace VkNetExtend
         /// <summary>
         /// Оповещает о новых записях на стене сообщества
         /// </summary>
-        public static event PostsListDelegate onNewPosts;
+        public event PostsListDelegate NewPosts;
         /// <summary>
         /// Оповещает об изменении закрепленного поста, значение -1 указывает на отсутствие закрепленного поста
         /// </summary>
-        public static event FixedPostChangedDelegate onFixedPostChanged;
+        public event FixedPostChangedDelegate FixedPostChanged;
 
         private WallGetObject getWallPosts(uint offset, uint count)
         {
-            var res = APIController.GetWallPosts(API, GroupId, count, offset);
+            var res = APIController.GetWallPosts(API, OwnerId, count, offset);
             if (res.WallPosts.Count > 0 && offset == 0)
             {
                 if (res.WallPosts[0].Id != FixedPostId && res.WallPosts[0].IsPinned)
                 {
-                    FixedPostId = APIController.GetFixedPost(API, GroupId);
-                    if (onFixedPostChanged != null)
-                        onFixedPostChanged(GroupId, FixedPostId);
+                    FixedPostId = APIController.GetFixedPost(API, OwnerId);
+                    if (FixedPostChanged != null)
+                        FixedPostChanged(OwnerId, FixedPostId);
                 }
             }
             return res;
@@ -95,7 +95,7 @@ namespace VkNetExtend
         /// </summary>
         /// <param name="lastDateToLoad">Крайник строк публикации постов (включительно)</param>
         /// <param name="lastPostId">Последний пост до которого необходимо загружать</param>
-        /// <param name="informImmediately">Оповещать о полученых постах через <see cref="onNewPosts"/> как только они загрузяться (null и false выключат оповещение)</param>
+        /// <param name="informImmediately">Оповещать о полученых постах через <see cref="NewPosts"/> как только они загрузяться (null и false выключат оповещение)</param>
         /// <returns></returns>
         public Task<IEnumerable<Post>> LoadWallPostsAsync(DateTime? lastDateToLoad = null, long lastPostId = 0, bool? informImmediately = true)
         {
@@ -121,8 +121,8 @@ namespace VkNetExtend
                     {
                         var tposts = FilterPosts(tmp, lastId, lastDateToLoad, lastPostId);
 
-                        if (informImmediately == true && onNewPosts != null)
-                            onNewPosts(GroupId, tposts);
+                        if (informImmediately == true && NewPosts != null)
+                            NewPosts(OwnerId, tposts);
 
                         posts.AddRange(tposts);
                         lastId = tmp.WallPosts[tmp.WallPosts.Count - 1].Id;
@@ -141,8 +141,8 @@ namespace VkNetExtend
             if (p.Count() > 0)
             {
                 _currentSleepSteps = 1;
-                if (InformImmediately == false && onNewPosts != null)
-                    onNewPosts(GroupId, p);
+                if (InformImmediately == false && NewPosts != null)
+                    NewPosts(OwnerId, p);
             }
             else if (_currentSleepSteps < MaxSleepSteps)
                 _currentSleepSteps++;
@@ -153,7 +153,7 @@ namespace VkNetExtend
         public WallWatcher(VkApi api, long gid)
         {
             API = api;
-            GroupId = gid;
+            OwnerId = gid;
 
             Active = false;
             LastPostId = -1;
