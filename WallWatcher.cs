@@ -48,7 +48,7 @@ namespace VkNetExtend
 
         private WallGetObject getWallPosts(uint offset, uint count)
         {
-            var res = APIController.GetWallPosts(API, OwnerId, count, offset);
+            var res = APIController.GetWallPosts(API, OwnerId, offset, count);
             if (offset == 0 && res.WallPosts.Count > 0)
             {
                 long fpid = res.WallPosts[0].Id;
