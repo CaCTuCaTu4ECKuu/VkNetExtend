@@ -108,17 +108,21 @@
             return Task.Run(() => { return LoadDialogs(api, offset, count); });
         }
 
-        public static long GetFixedPost(VkApi api, long gid)
+        public static long GetFixedPost(VkApi api, long wallId)
         {
-            IEnumerable<Group> gs = GetGroups(api, new long[] { gid }, GroupsFields.FixedPostId);
-            var g = (gs as ReadOnlyCollection<Group>).FirstOrDefault();
-            return g.FixedPostId.HasValue ? g.FixedPostId.Value : -1;
+            long res = -1;
+            var post = GetWallPosts(api, wallId, 0, 1).WallPosts.FirstOrDefault();
+            if (post != null && post.IsPinned)
+                res = post.Id;
+            return res;
         }
-        public static async Task<long> GetFixedPostAsync(VkApi api, long gid)
+        public static async Task<long> GetFixedPostAsync(VkApi api, long wallId)
         {
-            var gs = await GetGroupsAsync(api, new long[] { gid }, GroupsFields.FixedPostId);
-            var g = (gs as ReadOnlyCollection<Group>).FirstOrDefault();
-            return g.FixedPostId.HasValue ? g.FixedPostId.Value : -1;
+            long res = -1;
+            var post = (await GetWallPostsAsync(api, wallId, 0, 1)).WallPosts.FirstOrDefault();
+            if (post != null && post.IsPinned)
+                res = post.Id;
+            return res;
         }
 
         public static WallGetObject GetWallPosts(VkApi api, long ownerId, uint offset, uint count = 20)
