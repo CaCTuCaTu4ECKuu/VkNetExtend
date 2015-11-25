@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -73,6 +72,7 @@
                 catch (TooManyRequestsException)
                 {
                     Thread.Sleep(150);
+                    c--;
                 }
                 catch (Exception ex)
                 {
@@ -90,22 +90,6 @@
         private Task<LongPollHistoryResponse> GetLongPoolHistoryAsync()
         {
             return Task.Run(() => { return GetLongPoolHistory(); });
-        }
-
-        public Task<List<Message>> LoadDialogsAsync(uint offset, uint count = 20)
-        {
-            if (_account == null || string.IsNullOrEmpty(_account.AccessToken))
-                throw new NotImplementedException("Не авторизован в API ВК");
-
-            return Task.Run(() =>
-            {
-                DialogsGetParams p = new DialogsGetParams();
-                p.Count = count;
-                p.Offset = (int)offset;
-
-                MessagesGetObject d = _account.Messages.GetDialogs(p);
-                return d.Messages.ToList();
-            });
         }
 
         private async void _watchAsync(object state)

@@ -52,9 +52,9 @@ namespace VkNetExtend
             if (offset == 0 && res.WallPosts.Count > 0)
             {
                 long fpid = res.WallPosts[0].Id;
-                if (fpid != FixedPostId && res.WallPosts[0].IsPinned)
+                if (fpid != FixedPostId)
                 {
-                    FixedPostId = APIController.GetFixedPost(API, OwnerId);
+                    FixedPostId = res.WallPosts[0].IsPinned ? res.WallPosts[0].Id : -1;
                     if (FixedPostChanged != null)
                         FixedPostChanged(OwnerId, FixedPostId);
                 }
@@ -103,9 +103,10 @@ namespace VkNetExtend
 
             do
             {
+                // Для дебага
+                tmp = getWall(offset, count, lastId, lastDateToLoad, lastPostToLoad);
                 try
                 {
-                    tmp = getWall(offset, count, lastId, lastDateToLoad, lastPostToLoad);
                 }
                 catch (Exception Ex)
                 { throw new NotImplementedException(Ex.Message); }

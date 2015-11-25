@@ -89,7 +89,7 @@
             return Task.Run(() => { return GetGroups(api, gids, fields); });
         }
 
-        public static List<Message> LoadDialogs(VkApi api, int offset = 0, uint count = 20)
+        public static MessagesGetObject LoadDialogs(VkApi api, int offset = 0, uint count = 20)
         {
             _checkLocker(api);
             MessagesGetObject res = null;
@@ -101,9 +101,9 @@
             {
                 res = api.Messages.GetDialogs(dp);
             }
-            return res.Messages.ToList();
+            return res;
         }
-        public static Task<List<Message>> LoadDialogsAsync(VkApi api, int offset = 0, uint count = 20)
+        public static Task<MessagesGetObject> LoadDialogsAsync(VkApi api, int offset = 0, uint count = 20)
         {
             return Task.Run(() => { return LoadDialogs(api, offset, count); });
         }

@@ -64,6 +64,7 @@ namespace VkNetExtend
             else
                 w = (WallWatcher)WallWatchers[ownerId];
 
+            // TODO: Внести эти махинации внутрь WallWatcher чтобы их можно было приостановить в случае Stop и продолжить при Start
             if (lastDateToLoad != null || lastPostToLoad >= 0)
                 w.LoadWallPosts(lastDateToLoad, lastPostToLoad);
             w.Start(true);
