@@ -82,7 +82,7 @@ namespace VkNetExtend
                 }
                 catch (Exception Ex)
                 {
-                    ErrorLog += string.Format("{0} - {1}{3}", brokeToken, Ex.Message, Environment.NewLine);
+                    ErrorLog += string.Format("{0} - {1}{2}", brokeToken, Ex.Message, Environment.NewLine);
                 }
             }
 
@@ -103,10 +103,9 @@ namespace VkNetExtend
 
             do
             {
-                // Для дебага
-                tmp = getWall(offset, count, lastId, lastDateToLoad, lastPostToLoad);
                 try
                 {
+                    tmp = getWall(offset, count, lastId, lastDateToLoad, lastPostToLoad);
                 }
                 catch (Exception Ex)
                 { throw new NotImplementedException(Ex.Message); }
