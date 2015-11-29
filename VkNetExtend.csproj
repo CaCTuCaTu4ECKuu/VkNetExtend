@@ -43,7 +43,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="APIController.cs" />
     <Compile Include="LongPoolWatcher.cs" />
     <Compile Include="VKController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

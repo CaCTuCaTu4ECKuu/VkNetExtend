@@ -10,6 +10,7 @@ namespace VkNetExtend
     using VkNet;
     using VkNet.Model;
     using VkNet.Exception;
+    using VkNet.Model.RequestParams.Wall;
 
     public delegate void PostsListDelegate(long ownerId, IEnumerable<Post> posts);
     public delegate void FixedPostChangedDelegate(long ownerId, long pid);
@@ -47,7 +48,7 @@ namespace VkNetExtend
 
         private WallGetObject getWallPosts(uint offset, uint count)
         {
-            var res = APIController.GetWallPosts(API, OwnerId, offset, count);
+            var res = API.Wall.Get(new WallGetParams() { OwnerId = OwnerId, Offset = offset, Count = count });
             if (offset == 0 && res.WallPosts.Count > 0)
             {
                 long fpid = res.WallPosts[0].Id;
