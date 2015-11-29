@@ -40,7 +40,7 @@ namespace VkNetExtend
             return Task.Run(() => { return Authorize(applicationId, login, password, settings); });
         }
 
-        public void StartMessagesUpdateWatch(ulong? LastTs = null, ulong? LastPts = null)
+        public void StartLongPoolWatch(ulong? LastTs = null, ulong? LastPts = null)
         {
             if (LongPool == null)
             {
