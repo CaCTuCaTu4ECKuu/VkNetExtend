@@ -1,7 +1,7 @@
 ﻿namespace VkNetExtend
 {
     using System;
-    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -10,7 +10,7 @@
     using VkNet.Exception;
     using VkNet.Model.RequestParams.Messages;
 
-    public delegate void MessagesRecievedDelegate(IEnumerable<Message> messages, long accountID);
+    public delegate void MessagesRecievedDelegate(VkApi owner, ReadOnlyCollection<Message> messages);
 
     public class LongPoolWatcher
     {
@@ -81,7 +81,11 @@
             }
 
             if (history != null)
+            {
                 Pts = history.NewPts;
+                foreach (var m in history.Messages)
+                    m.FromId = m.Type == VkNet.Enums.MessageType.Sended ? _account.UserId : m.UserId;
+            }
             else
                 throw new NotImplementedException(errorLog);
 
@@ -99,7 +103,7 @@
             {
                 _currentSleepSteps = 1;
                 if (NewMessages != null)
-                    NewMessages(history.Messages, _account.UserId.Value);
+                    NewMessages(_account, history.Messages);
             }
             else if (_currentSleepSteps < MaxSleepSteps)
                 _currentSleepSteps++;

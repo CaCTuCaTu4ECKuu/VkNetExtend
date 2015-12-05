@@ -12,7 +12,7 @@ namespace VkNetExtend
     using VkNet.Exception;
     using VkNet.Model.RequestParams.Wall;
 
-    public delegate void PostsListDelegate(long ownerId, IEnumerable<Post> posts);
+    public delegate void PostsListDelegate(List<Post> posts);
     public delegate void FixedPostChangedDelegate(long ownerId, long pid);
 
     public class WallWatcher
@@ -92,7 +92,7 @@ namespace VkNetExtend
             return tmp;
         }
 
-        public IEnumerable<Post> LoadWallPosts(DateTime? lastDateToLoad = null, long lastPostToLoad = long.MaxValue, bool? informImmediately = true)
+        public List<Post> LoadWallPosts(DateTime? lastDateToLoad = null, long lastPostToLoad = long.MaxValue, bool? informImmediately = true)
         {
             List<Post> posts = new List<Post>();
             WallGetObject tmp;
@@ -115,7 +115,7 @@ namespace VkNetExtend
                     var tposts = FilterPosts(tmp, lastId, lastDateToLoad, lastPostToLoad);
 
                     if (informImmediately == true && NewPosts != null)
-                        NewPosts(OwnerId, tposts);
+                        NewPosts(tposts.ToList());
 
                     posts.AddRange(tposts);
                     lastId = tmp.WallPosts[tmp.WallPosts.Count - 1].Id;
@@ -123,7 +123,7 @@ namespace VkNetExtend
                 }
             }
             while (tmp.WallPosts.Count == count && lastId > lastPostToLoad && tmp.WallPosts.LastOrDefault()?.Date > lastDateToLoad);
-            return posts as IEnumerable<Post>;
+            return posts;
         }
         /// <summary>
         /// Загружает список постов со стены сообщества с первого и до указанного и\или указанной даты
@@ -132,20 +132,20 @@ namespace VkNetExtend
         /// <param name="lastPostToLoad">Последний пост до которого необходимо загружать</param>
         /// <param name="informImmediately">Оповещать о полученых постах через <see cref="NewPosts"/> как только они загрузяться (null и false выключат оповещение)</param>
         /// <returns></returns>
-        public Task<IEnumerable<Post>> LoadWallPostsAsync(DateTime? lastDateToLoad = null, long lastPostToLoad = long.MaxValue, bool? informImmediately = true)
+        public Task<List<Post>> LoadWallPostsAsync(DateTime? lastDateToLoad = null, long lastPostToLoad = long.MaxValue, bool? informImmediately = true)
         {
             return Task.Run(() => { return LoadWallPosts(lastDateToLoad, lastPostToLoad, informImmediately); });
         }
 
         private async void _watchAsync(object o)
         {
-            IEnumerable<Post> p = await LoadWallPostsAsync(null, LastPostId + 1, InformImmediately);
+            List<Post> p = await LoadWallPostsAsync(null, LastPostId + 1, InformImmediately);
 
             if (p.Count() > 0)
             {
                 _currentSleepSteps = 1;
                 if (InformImmediately == false && NewPosts != null)
-                    NewPosts(OwnerId, p);
+                    NewPosts(p);
             }
             else if (_currentSleepSteps < MaxSleepSteps)
                 _currentSleepSteps++;
@@ -190,7 +190,7 @@ namespace VkNetExtend
         /// <param name="lastDateToLoad">Дата и время, до которого нужно выбрать посты</param>
         /// <param name="lastPostToLoad">Последний пост, который нужно выбрать</param>
         /// <returns></returns>
-        public static IEnumerable<Post> FilterPosts(WallGetObject wall, long thresholdId = long.MaxValue, DateTime? lastDateToLoad = null, long lastPostToLoad = long.MaxValue)
+        public static List<Post> FilterPosts(WallGetObject wall, long thresholdId = long.MaxValue, DateTime? lastDateToLoad = null, long lastPostToLoad = long.MaxValue)
         {
             var posts = wall.WallPosts;
             if (posts.Count > 0)
@@ -212,11 +212,11 @@ namespace VkNetExtend
                         endIndex--;
 
                 if (startIndex <= endIndex)
-                    return posts.Skip(startIndex).Take(endIndex - startIndex + 1).ToArray();
+                    return posts.Skip(startIndex).Take(endIndex - startIndex + 1).ToList();
             }
-            return new Post[0];
+            return new List<Post>();
         }
-        public static Task<IEnumerable<Post>> FilterPostsAsync(WallGetObject wall, long thresholdId = long.MaxValue, DateTime? lastDateToLoad = null, long lastPostToLoad = long.MaxValue)
+        public static Task<List<Post>> FilterPostsAsync(WallGetObject wall, long thresholdId = long.MaxValue, DateTime? lastDateToLoad = null, long lastPostToLoad = long.MaxValue)
         {
             return Task.Run(() => { return FilterPosts(wall, thresholdId, lastDateToLoad, lastPostToLoad); });
         }
