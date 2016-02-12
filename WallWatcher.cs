@@ -10,7 +10,7 @@ namespace VkNetExtend
     using VkNet;
     using VkNet.Model;
     using VkNet.Exception;
-    using VkNet.Model.RequestParams.Wall;
+    using VkNet.Model.RequestParams;
 
     public delegate void PostsListDelegate(List<Post> posts);
     public delegate void FixedPostChangedDelegate(long ownerId, long pid);
@@ -51,14 +51,14 @@ namespace VkNetExtend
             var res = API.Wall.Get(new WallGetParams() { OwnerId = OwnerId, Offset = offset, Count = count });
             if (offset == 0 && res.WallPosts.Count > 0)
             {
-                long fpid = res.WallPosts[0].Id;
+                long fpid = res.WallPosts[0].Id.Value;
                 if (fpid != FixedPostId)
                 {
-                    FixedPostId = res.WallPosts[0].IsPinned ? res.WallPosts[0].Id : -1;
+                    FixedPostId = res.WallPosts[0].IsPinned.Value ? res.WallPosts[0].Id.Value : -1;
                     if (FixedPostChanged != null)
                         FixedPostChanged(OwnerId, FixedPostId);
                 }
-                LastPostId = fpid != FixedPostId ? fpid : res.WallPosts.Count > 1 ? res.WallPosts[1].Id : LastPostId;
+                LastPostId = fpid != FixedPostId ? fpid : res.WallPosts.Count > 1 ? res.WallPosts[1].Id.Value : LastPostId;
             }
             return res;
         }
@@ -118,7 +118,7 @@ namespace VkNetExtend
                         NewPosts(tposts.ToList());
 
                     posts.AddRange(tposts);
-                    lastId = tmp.WallPosts[tmp.WallPosts.Count - 1].Id;
+                    lastId = tmp.WallPosts[tmp.WallPosts.Count - 1].Id.Value;
                     offset += count;
                 }
             }
@@ -198,7 +198,7 @@ namespace VkNetExtend
                 int startIndex = 0;
                 int endIndex = posts.Count - 1;
 
-                if (posts[0].IsPinned)
+                if (posts[0].IsPinned.Value)
                     startIndex++;
 
                 while (startIndex <= endIndex && posts[startIndex].Id >= thresholdId)

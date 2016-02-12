@@ -8,7 +8,7 @@
     using VkNet;
     using VkNet.Model;
     using VkNet.Exception;
-    using VkNet.Model.RequestParams.Messages;
+    using VkNet.Model.RequestParams;
 
     public delegate void MessagesRecievedDelegate(VkApi owner, ReadOnlyCollection<Message> messages);
 
@@ -54,7 +54,7 @@
         {
             if (!Ts.HasValue)
                 GetLongPoolServer(null);
-            GetLongPollHistoryParams rp = new GetLongPollHistoryParams();
+            MessagesGetLongPollHistoryParams rp = new MessagesGetLongPollHistoryParams();
             rp.Ts = Ts.Value;
             rp.Pts = Pts;
 
