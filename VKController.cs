@@ -4,12 +4,15 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+
+using VkNet;
+using VkNet.Model;
 
 namespace VkNetExtend
 {
-    using VkNet;
-    using VkNet.Model;
+    using Wall;
 
     public class VKController
     {
@@ -40,7 +43,7 @@ namespace VkNetExtend
             }
             LongPool.StartAsync(LastTs, LastPts);
         }
-        public void StartWallWatch(long ownerId, DateTime? lastDateToLoad = null, long lastPostToLoad = -1)
+        public void StartWallWatch(CancellationToken cancellationToken, long ownerId, DateTime? lastDateToLoad = null, long lastPostToLoad = -1)
         {
             WallWatcher w = null;
             if (!WallWatchers.ContainsKey(ownerId))
@@ -55,14 +58,17 @@ namespace VkNetExtend
             else
                 w = (WallWatcher)WallWatchers[ownerId];
 
+            WallLoadParametrs loadParams = new WallLoadParametrs();
+            loadParams.LastDateToLoad = lastDateToLoad;
+            loadParams.LastPostToLoad = lastPostToLoad;
             // TODO: Внести эти махинации внутрь WallWatcher чтобы их можно было приостановить в случае Stop и продолжить при Start
             if (lastDateToLoad != null || lastPostToLoad >= 0)
-                w.LoadWallPosts(lastDateToLoad, lastPostToLoad);
+                w.LoadWallPosts(cancellationToken, loadParams);
             w.Start(true);
         }
-        public Task StartWallWatchAsync(long ownerId, DateTime? lastDateToLoad = null, long lastPostToLoad = -1)
+        public Task StartWallWatchAsync(CancellationToken cancellationToken, long ownerId, DateTime? lastDateToLoad = null, long lastPostToLoad = -1)
         {
-            return Task.Run(() => { StartWallWatch(ownerId, lastDateToLoad, lastPostToLoad); });
+            return Task.Run(() => { StartWallWatch(cancellationToken, ownerId, lastDateToLoad, lastPostToLoad); });
         }
         public void StopWallWath(long ownerId)
         {
