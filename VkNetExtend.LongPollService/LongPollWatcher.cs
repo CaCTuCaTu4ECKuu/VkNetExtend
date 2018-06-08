@@ -75,7 +75,7 @@ namespace VkNetExtend.LongPollService
             }
         }
 
-        protected Task<LongPollHistoryResponse> GetLongPollHistoryAsync()
+        protected Task<LongPollHistoryResponse> GetLongPollHistoryAsync(long? maxMsgId = null)
         {
             if (!Ts.HasValue)
                 GetLongPollHistoryAsync();
@@ -83,7 +83,15 @@ namespace VkNetExtend.LongPollService
             var req = new MessagesGetLongPollHistoryParams()
             {
                 Ts = Ts.Value,
-                Pts = Pts
+                Pts = Pts,
+
+                EventsLimit = 250,
+                Fields = _options.HistoryFields,
+                MaxMsgId = null,
+
+                PreviewLength = _options.HistoryPreviewLength,
+                Onlines = _options.HistoryOnlines,
+                LpVersion = _options.LongPollVersion
             };
 
             return _api.Messages.GetLongPollHistoryAsync(req)

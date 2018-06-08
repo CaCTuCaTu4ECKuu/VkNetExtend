@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+using VkNet.Enums.Filters;
+
 namespace VkNetExtend.LongPollService
 {
     public class LongPollWatcherOptions
@@ -26,5 +28,21 @@ namespace VkNetExtend.LongPollService
         /// Watcher thread sleep time after no activity step in miliseconds
         /// </summary>
         public int StepSleepTimeMsec { get; set; } = 333;
+
+        /// <summary>
+        /// Count of symbols to trim messages. 0 - dont trim messages
+        /// </summary>
+        public int HistoryPreviewLength { get; set; } = 0;
+
+        /// <summary>
+        /// Return actions indicating that user become online/offline
+        /// </summary>
+        public bool HistoryOnlines { get; set; } = true;
+
+        /// <summary>
+        /// List of additional fields to return.
+        /// <see href="https://vk.com/dev/objects/user"/>
+        /// </summary>
+        public UsersFields HistoryFields { get; set; } = null;
     }
 }
