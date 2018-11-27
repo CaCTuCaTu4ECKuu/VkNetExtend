@@ -3,11 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2000
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VkNetExtend", "VkNetExtend.csproj", "{0C162704-199D-43BD-B23E-E25356A9A6C5}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VkNetExtend.LongPollService", "VkNetExtend.LongPollService\VkNetExtend.LongPollService.csproj", "{915A4B63-1077-4396-856F-5AEF89C4C1D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VkNetExtend.WallWatchService", "VkNetExtend.WallWatchService\VkNetExtend.WallWatchService.csproj", "{48E5BF4E-CEEC-43CB-B560-E4949C8DA2EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VkNetExtend.WallWatchService", "VkNetExtend.WallWatchService\VkNetExtend.WallWatchService.csproj", "{48E5BF4E-CEEC-43CB-B560-E4949C8DA2EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0C162704-199D-43BD-B23E-E25356A9A6C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0C162704-199D-43BD-B23E-E25356A9A6C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0C162704-199D-43BD-B23E-E25356A9A6C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0C162704-199D-43BD-B23E-E25356A9A6C5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{915A4B63-1077-4396-856F-5AEF89C4C1D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{915A4B63-1077-4396-856F-5AEF89C4C1D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{915A4B63-1077-4396-856F-5AEF89C4C1D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
