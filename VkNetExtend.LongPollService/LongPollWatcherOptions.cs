@@ -12,7 +12,7 @@ namespace VkNetExtend.LongPollService
         /// Version for connection to Long Pool.
         /// <see href="https://vk.com/dev/using_longpoll"/>
         /// </summary>
-        public uint LongPollVersion { get; set; } = 2;
+        public uint LongPollVersion { get; set; } = 3;
 
         /// <summary>
         /// Waiting time
@@ -27,7 +27,7 @@ namespace VkNetExtend.LongPollService
         /// <summary>
         /// Watcher thread sleep time after no activity step in miliseconds
         /// </summary>
-        public int StepSleepTimeMsec { get; set; } = 333;
+        public int StepSleepTimeMsec { get; set; } = 334;
 
         /// <summary>
         /// Count of symbols to trim messages. 0 - dont trim messages

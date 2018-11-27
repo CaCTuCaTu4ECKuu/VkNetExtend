@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using VkNet;
 using VkNet.Model;
 
 namespace VkNetExtend.LongPollService
@@ -14,11 +11,6 @@ namespace VkNetExtend.LongPollService
 
     public interface ILongPollWatcher
     {
-        /// <summary>
-        /// Current amount of passed steps where nothing happened
-        /// </summary>
-        int CurrentSleepSteps { get; }
-
         /// <summary>
         /// Last value of "ts" property retrieved from Long Poll server
         /// </summary>
