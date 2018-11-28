@@ -10,18 +10,12 @@ namespace VkNetExtend.MessageLongPoll.Models
     public class StartWatchModel
     {
         /// <summary>
-        /// Last retrieved event id to get unmanaged actions
+        /// Last retrieved Ts
+        /// </summary>
+        public ulong? Ts { get; set; } = null;
+        /// <summary>
+        /// Last retrieved Pts
         /// </summary>
         public ulong? Pts { get; set; } = null;
-
-        /// <summary>
-        /// If <see cref="Pts"/> less that actual action Id missing actions will be loaded on start
-        /// </summary>
-        public bool LoadUnretrievedEvents { get; set; }
-
-        /// <summary>
-        /// Limit count of event that will be loaded within <see cref="LoadUnretrievedEvents"/>
-        /// </summary>
-        public int UnretrievedEventsLoadLimit { get; set; } = int.MaxValue;
     }
 }

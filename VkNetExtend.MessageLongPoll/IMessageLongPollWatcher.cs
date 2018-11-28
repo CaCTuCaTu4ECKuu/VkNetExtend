@@ -8,6 +8,7 @@ namespace VkNetExtend.MessageLongPoll
     using Models;
 
     public delegate void LongPollNewMessagesDelegate(IMessageLongPollWatcher watcher, IEnumerable<Message> messages);
+    public delegate void LongPollNewEventsDelegate(IMessageLongPollWatcher watcher, LongPollHistoryResponse history);
 
     public interface IMessageLongPollWatcher
     {
@@ -32,15 +33,24 @@ namespace VkNetExtend.MessageLongPoll
         bool Active { get; }
 
         /// <summary>
-        /// Messages retrieved by Long Poll watcher
+        /// Occures when Long Poll watcher retrieve new messages
         /// </summary>
         event LongPollNewMessagesDelegate NewMessages;
 
         /// <summary>
-        /// Start watching for new events async
+        /// Occures when Long Poll watcher retrieve new events
+        /// </summary>
+        event LongPollNewEventsDelegate NewEvents;
+
+        /// <summary>
+        /// Start watching for new events
         /// </summary>
         Task StartWatchAsync(StartWatchModel model);
-
+        /// <summary>
+        /// Start watching for new events from this moment
+        /// </summary>
+        /// <returns></returns>
+        Task StartWatchAsync();
         /// <summary>
         /// Suspend watching
         /// </summary>

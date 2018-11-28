@@ -11,6 +11,7 @@ using VkNet.Model.RequestParams;
 namespace VkNetExtend.MessageLongPoll
 {
     using Models;
+    using Logger;
 
     public class VkNetExtMessageLongPollWatcher : IMessageLongPollWatcher
     {
@@ -42,6 +43,7 @@ namespace VkNetExtend.MessageLongPoll
         private Timer _watchTimer;
 
         public event LongPollNewMessagesDelegate NewMessages;
+        public event LongPollNewEventsDelegate NewEvents;
 
         /// <summary>
         /// 
@@ -69,7 +71,7 @@ namespace VkNetExtend.MessageLongPoll
         public VkNetExtMessageLongPollWatcher(MessageLongPollWatcherOptions options,
             VkApi api)
         {
-            _logger = null;
+            _logger = new ConsoleLogger();
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _api = api ?? throw new ArgumentNullException(nameof(api));
         }
@@ -105,14 +107,16 @@ namespace VkNetExtend.MessageLongPoll
         protected async Task<LongPollHistoryResponse> GetLongPollHistoryAsync(long? maxMsgId = null)
         {
             if (!Ts.HasValue)
-                await GetLongPollHistoryAsync();
+            {
+                _logger?.LogTrace($"Watcher for {ApiTargetDescriptor()} \"{nameof(Ts)}\" property is not defined.");
+                await GetLongPollServerAsync().ConfigureAwait(true);
+            }
 
             var req = new MessagesGetLongPollHistoryParams()
-            {
+            {                
                 Ts = Ts.Value,
                 Pts = Pts,
 
-                EventsLimit = 250,
                 Fields = _options.HistoryFields,
                 MaxMsgId = null,
 
@@ -121,64 +125,115 @@ namespace VkNetExtend.MessageLongPoll
                 LpVersion = _options.LongPollVersion
             };
 
-            var res = await _api.Messages.GetLongPollHistoryAsync(req).ConfigureAwait(true);
-            Pts = res.NewPts;
+            _logger?.LogTrace($"Loading long pool history for {ApiTargetDescriptor()}. Ts: {Ts?.ToString() ?? "null"}, Pts: {Pts?.ToString() ?? "null"}.");
+            try
+            {
+                var res = await _api.Messages.GetLongPollHistoryAsync(req).ConfigureAwait(true);
+                if (res.NewPts != Pts)
+                {
+                    Pts = res.NewPts;
+                    _logger?.LogTrace($"Watcher {ApiTargetDescriptor()} new \"{nameof(Pts)}\" value is {res.NewPts}.{Environment.NewLine}" +
+                        $"Recieve {res.History.Count} new events. {res.UnreadMessages} unread messages.");
+                }
 
-            return res;
+                return res;
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError($"Exception occured when loading long poll history for {ApiTargetDescriptor()}.{Environment.NewLine}" +
+                    $"{(ex.InnerException == null ? ex.Message : ex.InnerException.Message)}");
+                return null;
+            }
         }
 
         protected async Task WatchStepAsync(object state)
         {
-            var history = await GetLongPollHistoryAsync().ConfigureAwait(true);
-
-            if (history.Messages.Count > 0)
+            if (Active)
             {
-                CurrentSleepSteps = 1;
+                var history = await GetLongPollHistoryAsync().ConfigureAwait(true);
 
-                NewMessages?.Invoke(this, history.Messages);
-            }
-            else
-            {
-                if (CurrentSleepSteps < _options.MaxSleepSteps)
-                    CurrentSleepSteps++;
-            }
+                if (history != null)
+                {
+                    if (history.History.Count > 0)
+                    {
+                        CurrentSleepSteps = 1;
 
-            _watchTimer?.Change(CurrentSleepSteps * _options.StepSleepTimeMsec, Timeout.Infinite);
+                        NewEvents?.Invoke(this, history);
+                        if (history.Messages.Count > 0)
+                            NewMessages?.Invoke(this, history.Messages);
+                    }
+                    else
+                    {
+                        if (CurrentSleepSteps < _options.MaxSleepSteps)
+                            CurrentSleepSteps++;
+                    }
+                    _watchTimer?.Change(CurrentSleepSteps * _options.StepSleepTimeMsec, Timeout.Infinite);
+                }
+                else
+                {
+                    // TODO: Define situation when exceptions occured
+                    _watchTimer?.Change(CurrentSleepSteps * _options.StepSleepTimeMsec, Timeout.Infinite);
+                }
+            }
         }
-        private async void _watchStep(object state) => await WatchStepAsync(state);
+        private void _watchStep(object state) => WatchStepAsync(state).GetAwaiter().GetResult();
 
         public async Task StartWatchAsync(StartWatchModel model)
         {
             if (!Active)
             {
-                _logger?.Log(LogLevel.Trace, $"Starting watcher for {ApiTargetDescriptor()}{(model.Pts.HasValue ? $" with Pts: {model.Pts.Value}" : "")}.");
+                if (_logger.IsEnabled(LogLevel.Trace))
+                {
+                    _logger?.Log(LogLevel.Trace, $"Starting messages watcher for {ApiTargetDescriptor()}." +
+                        $"{(model.Ts.HasValue ? $" Ts: {model.Ts.Value}." : "")}{(model.Pts.HasValue ? $" Pts: {model.Pts.Value}." : "")}");
+                }
+                else
+                    _logger?.Log(LogLevel.Information, $"Starting messages watcher{(_api.UserId.HasValue ? $" for user {_api.UserId.Value}." : ".")}");
+
+                Ts = model.Ts;
+                Pts = model.Pts;
 
                 Active = true;
-                Pts = model.Pts;
 
                 if (!Enabled)
                 {
-                    _logger?.Log(LogLevel.Trace, $"Watcher started for {ApiTargetDescriptor()}.");
-
-                    await GetLongPollServerAsync().ConfigureAwait(true);
-                    _watchTimer = new Timer(new TimerCallback(_watchStep), null, 0, Timeout.Infinite);
+                    Enabled = true;
+                    try
+                    {
+                        await GetLongPollServerAsync().ConfigureAwait(true);
+                        _logger?.Log(LogLevel.Trace, $"Watcher started for {ApiTargetDescriptor()}.");
+                    }
+                    catch (Exception)
+                    {
+                        Enabled = false;
+                        _logger?.Log(LogLevel.Error, $"Failed to start watcher for {ApiTargetDescriptor()}.");
+                    }
                 }
                 else
                 {
                     _logger?.Log(LogLevel.Trace, $"Watcher resumed for {ApiTargetDescriptor()}.");
                 }
+                _watchTimer = new Timer(new TimerCallback(_watchStep), null, 0, Timeout.Infinite);
             }
             else
                 _logger?.Log(LogLevel.Trace, $"Attemption to start active watcher for {ApiTargetDescriptor()}.");
         }
+
+        public Task StartWatchAsync() => StartWatchAsync(new StartWatchModel());
 
         public void StopWatch()
         {
             if (Active)
             {
                 Active = false;
-
-                _logger?.Log(LogLevel.Trace, $"Watcher paused for {ApiTargetDescriptor()}{(Ts.HasValue ? $" on TS:{Ts.Value}" : "")}.");
+                if (_logger.IsEnabled(LogLevel.Trace))
+                {
+                    _logger?.Log(LogLevel.Trace, $"Watcher paused for {ApiTargetDescriptor()}." +
+                        $"{(Ts.HasValue ? $" Ts: {Ts.Value}." : "")}{(Pts.HasValue ? $" Pts: {Pts.Value}." : "")}");
+                }
+                else
+                    _logger?.Log(LogLevel.Information, $"Watcher paused{(_api.UserId.HasValue ? $" for user {_api.UserId.Value}." : ".")}");
+                
             }
         }
 
@@ -191,7 +246,7 @@ namespace VkNetExtend.MessageLongPoll
             else
                 return _api.UserId.HasValue ? $"user {_api.UserId.Value}" : $"token {_api.Token}";
         }
-        
+
         #endregion
     }
 }
