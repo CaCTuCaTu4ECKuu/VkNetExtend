@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 
-namespace VkNetExtend.Wall
+using VkNet;
+using VkNet.Model;
+using VkNet.Exception;
+using VkNet.Model.RequestParams;
+
+namespace VkNetExtend.Old
 {
-    using System.Threading;
-
-    using VkNet;
-    using VkNet.Model;
-    using VkNet.Exception;
-    using VkNet.Model.RequestParams;
-
     public delegate void PostsListDelegate(List<Post> posts);
     public delegate void FixedPostChangedDelegate(long ownerId, long pid);
 

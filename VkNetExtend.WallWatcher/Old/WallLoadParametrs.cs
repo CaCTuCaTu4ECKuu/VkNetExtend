@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VkNetExtend.Wall
+namespace VkNetExtend.Old
 {
     public struct WallLoadParametrs
     {

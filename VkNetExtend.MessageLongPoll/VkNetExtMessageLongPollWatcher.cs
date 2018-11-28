@@ -8,14 +8,14 @@ using VkNet;
 using VkNet.Model;
 using VkNet.Model.RequestParams;
 
-namespace VkNetExtend.LongPollService
+namespace VkNetExtend.MessageLongPoll
 {
     using Models;
 
-    public class VkNetExtLongPollWatcher : ILongPollWatcher
+    public class VkNetExtMessageLongPollWatcher : IMessageLongPollWatcher
     {
         protected readonly ILogger _logger;
-        protected readonly LongPollWatcherOptions _options;
+        protected readonly MessageLongPollWatcherOptions _options;
         protected readonly VkApi _api;
 
         #region Properties
@@ -50,8 +50,8 @@ namespace VkNetExtend.LongPollService
         /// <param name="options"></param>
         /// <param name="api"></param>
         /// <exception cref="ArgumentNullException">Options or Api must be defined</exception>
-        public VkNetExtLongPollWatcher(ILogger logger,
-            LongPollWatcherOptions options,
+        public VkNetExtMessageLongPollWatcher(ILogger logger,
+            MessageLongPollWatcherOptions options,
             VkApi api)
         {
             _logger = logger;
@@ -66,7 +66,7 @@ namespace VkNetExtend.LongPollService
         /// <param name="options"></param>
         /// <param name="api"></param>
         /// <exception cref="ArgumentNullException">Options or Api must be defined</exception>
-        public VkNetExtLongPollWatcher(LongPollWatcherOptions options,
+        public VkNetExtMessageLongPollWatcher(MessageLongPollWatcherOptions options,
             VkApi api)
         {
             _logger = null;

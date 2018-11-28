@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace VkNetExtend.WallWatchService
+namespace VkNetExtend.WallWatcher
 {
-    public class WallWatchOptions
+    public class WallWatcherOptions
     {
         /// <summary>
         /// Initial posts count to load per request (amount of last posts to load on probe request)

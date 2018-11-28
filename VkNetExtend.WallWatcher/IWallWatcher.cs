@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace VkNetExtend.WallWatchService
+namespace VkNetExtend.WallWatcher
 {
-    public interface IWallWatchService
+    public interface IWallWatcher
     {
 
     }

@@ -5,12 +5,12 @@ using Microsoft.Extensions.Logging;
 
 using VkNet;
 
-namespace VkNetExtend.WallWatchService
+namespace VkNetExtend.WallWatcher
 {
-    public class VkNetExtWallWatchService : IWallWatchService
+    public class VkNetExtWallWatcher: IWallWatcher
     {
         protected readonly ILogger _logger;
-        protected readonly WallWatchOptions _options;
+        protected readonly WallWatcherOptions _options;
         protected readonly VkApi _api;
 
         #region Properties
@@ -23,8 +23,8 @@ namespace VkNetExtend.WallWatchService
 
         #endregion
 
-        public VkNetExtWallWatchService(ILogger logger,
-            WallWatchOptions options,
+        public VkNetExtWallWatcher(ILogger logger,
+            WallWatcherOptions options,
             VkApi api)
         {
             _logger = logger;
@@ -32,7 +32,7 @@ namespace VkNetExtend.WallWatchService
             _api = api;
         }
 
-        public VkNetExtWallWatchService(WallWatchOptions options,
+        public VkNetExtWallWatcher(WallWatcherOptions options,
             VkApi api)
         {
             _logger = null;

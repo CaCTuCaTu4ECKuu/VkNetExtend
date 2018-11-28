@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 
 using VkNet.Model;
 
-namespace VkNetExtend.LongPollService
+namespace VkNetExtend.MessageLongPoll
 {
     using Models;
 
-    public delegate void LongPollNewMessagesDelegate(ILongPollWatcher watcher, IEnumerable<Message> messages);
+    public delegate void LongPollNewMessagesDelegate(IMessageLongPollWatcher watcher, IEnumerable<Message> messages);
 
-    public interface ILongPollWatcher
+    public interface IMessageLongPollWatcher
     {
         /// <summary>
         /// Last value of "ts" property retrieved from Long Poll server

@@ -4,9 +4,9 @@ using System.Text;
 
 using VkNet.Enums.Filters;
 
-namespace VkNetExtend.LongPollService
+namespace VkNetExtend.MessageLongPoll
 {
-    public class LongPollWatcherOptions
+    public class MessageLongPollWatcherOptions
     {
         /// <summary>
         /// Version for connection to Long Pool.
@@ -46,8 +46,8 @@ namespace VkNetExtend.LongPollService
         public UsersFields HistoryFields { get; set; } = null;
 
         /// <summary>
-        /// Returns new instance of <see cref="LongPollWatcherOptions"/> with default settings.
+        /// Returns new instance of <see cref="MessageLongPollWatcherOptions"/> with default settings.
         /// </summary>
-        public static LongPollWatcherOptions Default => new LongPollWatcherOptions();
+        public static MessageLongPollWatcherOptions Default => new MessageLongPollWatcherOptions();
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace VkNetExtend.LongPollService.Models
+namespace VkNetExtend.MessageLongPoll.Models
 {
     /// <summary>
     /// Options for starting LongPool watcher
