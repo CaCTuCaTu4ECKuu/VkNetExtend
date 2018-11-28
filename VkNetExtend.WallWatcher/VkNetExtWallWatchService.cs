@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 using VkNet;
 
 namespace VkNetExtend.WallWatchService
 {
-    public class WallWatchService : IWallWatchService
+    public class VkNetExtWallWatchService : IWallWatchService
     {
         protected readonly ILogger _logger;
         protected readonly WallWatchOptions _options;
@@ -23,7 +23,7 @@ namespace VkNetExtend.WallWatchService
 
         #endregion
 
-        public WallWatchService(ILogger logger,
+        public VkNetExtWallWatchService(ILogger logger,
             WallWatchOptions options,
             VkApi api)
         {
@@ -32,14 +32,12 @@ namespace VkNetExtend.WallWatchService
             _api = api;
         }
 
-        public WallWatchService(WallWatchOptions options,
+        public VkNetExtWallWatchService(WallWatchOptions options,
             VkApi api)
         {
             _logger = null;
             _options = options;
             _api = api;
         }
-
-
     }
 }

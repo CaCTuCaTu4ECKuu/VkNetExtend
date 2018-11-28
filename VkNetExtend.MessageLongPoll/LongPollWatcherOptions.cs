@@ -44,5 +44,10 @@ namespace VkNetExtend.LongPollService
         /// <see href="https://vk.com/dev/objects/user"/>
         /// </summary>
         public UsersFields HistoryFields { get; set; } = null;
+
+        /// <summary>
+        /// Returns new instance of <see cref="LongPollWatcherOptions"/> with default settings.
+        /// </summary>
+        public static LongPollWatcherOptions Default => new LongPollWatcherOptions();
     }
 }
