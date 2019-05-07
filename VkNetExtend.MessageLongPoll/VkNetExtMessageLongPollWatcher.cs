@@ -12,6 +12,7 @@ namespace VkNetExtend.MessageLongPoll
 {
     using Models;
     using Logger;
+    using VkNet.Exception;
 
     public class VkNetExtMessageLongPollWatcher : IMessageLongPollWatcher
     {
@@ -150,7 +151,15 @@ namespace VkNetExtend.MessageLongPoll
         {
             if (Active)
             {
-                var history = await GetLongPollHistoryAsync().ConfigureAwait(true);
+                LongPollHistoryResponse history = null;
+                try
+                {
+                    history = await GetLongPollHistoryAsync().ConfigureAwait(true);
+                }
+                catch (VkApiException apiEx)
+                {
+                    _logger?.LogError($"Error while loading long poll history.{Environment.NewLine}{apiEx.Message}");
+                }
 
                 if (history != null)
                 {
